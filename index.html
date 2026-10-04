@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2623606 班 · 课程表 | 2026 秋季学期</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#16181d; --ink2:#5b6270; --ink3:#8b93a1;
+  --line:#e6e8ec; --line2:#f0f2f5; --accent:#2563eb;
+  --major:#2563eb; --major-bg:#e8f0fe;
+  --lang:#c2410c;  --lang-bg:#ffede0;
+  --pol:#7c3aed;   --pol-bg:#f0e9fe;
+  --pe:#047857;    --pe-bg:#dcf5ea;
+  --talk:#0e7490;  --talk-bg:#d9f3f8;
+  --warn:#b45309;  --warn-bg:#fef3c7;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 16px rgba(16,24,40,.06);
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0f1115; --card:#171a20; --ink:#e9ecf1; --ink2:#a7b0be; --ink3:#7c8595;
+    --line:#252a33; --line2:#1e222a;
+    --major:#7aa7ff; --major-bg:#16233c;
+    --lang:#ff9d5c;  --lang-bg:#3a2416;
+    --pol:#b79bff;   --pol-bg:#241a3d;
+    --pe:#4ccf9e;    --pe-bg:#10301f;
+    --talk:#5fd0e8;  --talk-bg:#0d2b33;
+    --warn:#f0c264;  --warn-bg:#3a2e10;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+  font-size:15px; line-height:1.6; letter-spacing:.01em;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 72px}
+
+/* ── header ── */
+header{padding:34px 0 20px}
+.eyebrow{font-size:12.5px;color:var(--ink3);letter-spacing:.08em;font-weight:600;text-transform:uppercase}
+h1{margin:6px 0 4px;font-size:29px;line-height:1.25;letter-spacing:-.02em;font-weight:750}
+.sub{color:var(--ink2);font-size:14px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 13px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:19px;line-height:1.2;font-variant-numeric:tabular-nums;font-weight:700}
+.stat span{font-size:11.5px;color:var(--ink3)}
+
+/* ── tabs ── */
+nav{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);margin:0 -16px 22px;padding:8px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1px solid transparent;background:transparent;color:var(--ink2);font:inherit;font-size:14px;font-weight:600;padding:8px 15px;border-radius:9px;cursor:pointer;white-space:nowrap;transition:.14s}
+.tab:hover{background:var(--line2);color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--card);color:var(--ink);border-color:var(--line);box-shadow:var(--shadow)}
+.panel[hidden]{display:none}
+
+/* ── legend ── */
+.legend{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.lg{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2);background:var(--card);border:1px solid var(--line);padding:5px 11px;border-radius:999px}
+.dot{width:9px;height:9px;border-radius:3px;flex:none}
+
+/* ── week picker ── */
+.picker{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.picker label{font-size:13px;color:var(--ink2);font-weight:600}
+.weeks{display:flex;gap:5px;overflow-x:auto;padding:3px;scrollbar-width:none;flex:1;min-width:0}
+.weeks::-webkit-scrollbar{display:none}
+.wbtn{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink2);font:inherit;font-size:12.5px;font-weight:650;min-width:42px;padding:6px 9px;border-radius:8px;cursor:pointer;font-variant-numeric:tabular-nums;transition:.12s}
+.wbtn:hover{border-color:var(--ink3);color:var(--ink)}
+.wbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.wbtn .n{display:block;font-size:9.5px;font-weight:500;opacity:.72;letter-spacing:0}
+
+/* ── timetable grid ── */
+.gridcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.grid{display:grid;grid-template-columns:74px repeat(7,minmax(0,1fr));min-width:0}
+.gh{padding:11px 6px;text-align:center;font-size:12.5px;font-weight:700;color:var(--ink2);background:var(--line2);border-bottom:1px solid var(--line)}
+.gh.wk{color:var(--ink3)}
+.gh.we{color:var(--ink3);opacity:.55}
+.gt{padding:10px 6px;text-align:center;font-size:10.5px;color:var(--ink3);background:var(--line2);border-right:1px solid var(--line);border-bottom:1px solid var(--line);line-height:1.35;font-variant-numeric:tabular-nums}
+.gt b{display:block;font-size:12px;color:var(--ink2);font-weight:700}
+.gc{border-right:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:6px;min-height:74px;display:flex;flex-direction:column;gap:5px}
+.gc:last-child{border-right:0}
+.gc.dim{background:color-mix(in srgb,var(--line2) 45%,transparent)}
+.gc.ev-day{background:color-mix(in srgb,var(--warn) 7%,transparent)}
+.ev{padding:6px 8px;border-radius:9px;font-size:11.5px;line-height:1.45;border:1px solid;background:var(--card)}
+.ev b{display:block;font-size:13px;font-weight:700;letter-spacing:-.01em}
+.ev .m{color:var(--ink2);font-size:11px;font-variant-numeric:tabular-nums}
+.ev .r{color:var(--ink3);font-size:10.5px}
+.ev.t-major{color:var(--major);border-color:color-mix(in srgb,var(--major) 30%,transparent);background:var(--major-bg)}
+.ev.t-lang{color:var(--lang);border-color:color-mix(in srgb,var(--lang) 30%,transparent);background:var(--lang-bg)}
+.ev.t-pol{color:var(--pol);border-color:color-mix(in srgb,var(--pol) 30%,transparent);background:var(--pol-bg)}
+.ev.t-pe{color:var(--pe);border-color:color-mix(in srgb,var(--pe) 30%,transparent);background:var(--pe-bg)}
+.ev.t-talk{color:var(--talk);border-color:color-mix(in srgb,var(--talk) 30%,transparent);background:var(--talk-bg)}
+.ev.t-rest{color:var(--ink3);border-color:var(--line);background:var(--line2)}
+.ev.t-makeup{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 34%,transparent);background:var(--warn-bg)}
+.gc.mk-day{background:color-mix(in srgb,var(--warn) 9%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--warn) 26%,transparent)}
+.gh .mkb{display:inline-block;margin-left:4px;padding:1px 5px;border-radius:99px;font-size:10px;font-weight:700;color:var(--warn);background:var(--warn-bg)}
+.mkline{margin:10px 0 0;padding:10px 14px;border-radius:10px;font-size:12.5px;line-height:1.6;color:var(--warn);background:var(--warn-bg);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent)}
+.ev b,.ev .m,.ev .r{color:inherit}
+.ev .m,.ev .r{opacity:.82}
+.empty{color:var(--ink3);font-size:11px;text-align:center;padding:14px 0;opacity:.5}
+.weeknote{margin-top:14px;font-size:13px;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:11px 14px}
+/* 回到本周按钮（2026-09-10 新增） */
+.wbtn.nowbtn{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;margin-right:6px}
+.wbtn.nowbtn:hover{opacity:.88}
+
+/* ── month calendar ── */
+.months{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(298px,1fr));align-items:start}
+.month{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.mhead{padding:13px 15px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.mhead b{font-size:16px;letter-spacing:-.01em}
+.mhead span{font-size:12px;color:var(--ink3)}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);background:var(--line2);border-bottom:1px solid var(--line)}
+.dow div{text-align:center;font-size:11px;font-weight:700;color:var(--ink3);padding:7px 0}
+.days{display:grid;grid-template-columns:repeat(7,1fr)}
+.day{min-height:74px;border-right:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:5px 4px;display:flex;flex-direction:column;gap:3px;position:relative}
+.day:nth-child(7n){border-right:0}
+.day.out{background:color-mix(in srgb,var(--line2) 55%,transparent);opacity:.5}
+.day .dn{font-size:11.5px;font-weight:700;color:var(--ink2);line-height:1;font-variant-numeric:tabular-nums;display:flex;justify-content:space-between;align-items:center}
+.day .wk{font-size:9px;color:var(--ink3);font-weight:600}
+.day.today{background:color-mix(in srgb,var(--accent) 9%,transparent);box-shadow:inset 0 0 0 2px var(--accent)}
+.chip{border-radius:6px;padding:3px 5px;font-size:10px;line-height:1.32;font-weight:600;border:1px solid;overflow:hidden}
+.chip small{display:block;font-weight:500;opacity:.8;font-size:9px;font-variant-numeric:tabular-nums}
+.chip.c-major{color:var(--major);border-color:color-mix(in srgb,var(--major) 28%,transparent);background:var(--major-bg)}
+.chip.c-lang{color:var(--lang);border-color:color-mix(in srgb,var(--lang) 28%,transparent);background:var(--lang-bg)}
+.chip.c-pol{color:var(--pol);border-color:color-mix(in srgb,var(--pol) 28%,transparent);background:var(--pol-bg)}
+.chip.c-pe{color:var(--pe);border-color:color-mix(in srgb,var(--pe) 28%,transparent);background:var(--pe-bg)}
+.chip.c-talk{color:var(--talk);border-color:color-mix(in srgb,var(--talk) 28%,transparent);background:var(--talk-bg)}
+.chip.c-holiday{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 30%,transparent);background:var(--warn-bg)}
+.chip.c-misc{color:var(--ink2);border-color:var(--line);background:var(--line2)}
+.mfoot{padding:9px 22px;font-size:11px;color:var(--ink3);display:flex;gap:14px;flex-wrap:wrap}
+
+/* ── courses table ── */
+.courses{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--line2);vertical-align:top}
+th{background:var(--line2);font-size:11.5px;color:var(--ink2);font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:color-mix(in srgb,var(--line2) 50%,transparent)}
+td.cname{font-weight:700;white-space:nowrap}
+.pill{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:999px;font-weight:700;border:1px solid;white-space:nowrap}
+.tnum{font-variant-numeric:tabular-nums;color:var(--ink2)}
+h2{font-size:17px;margin:30px 0 12px;letter-spacing:-.01em;font-weight:700}
+h2:first-child{margin-top:0}
+.note{font-size:13px;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px 17px;box-shadow:var(--shadow)}
+.note ul{margin:8px 0 0;padding-left:20px}
+.note li{margin:5px 0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:13.5px;margin:0}
+.kv dt{color:var(--ink3);white-space:nowrap}
+.kv dd{margin:0}
+footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--ink3);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+@media (max-width:820px){
+  h1{font-size:23px}
+  .grid{grid-template-columns:52px repeat(7,minmax(58px,1fr));font-size:12px}
+  .gc{min-height:62px;padding:4px}
+  .ev{padding:4px 5px;font-size:10.5px;border-radius:7px}
+  .ev b{font-size:11.5px}
+  .ev .r{display:none}
+  .gridcard{overflow-x:auto}
+  .months{grid-template-columns:1fr}
+}
+@media print{
+  :root{--bg:#fff;--card:#fff;--shadow:none}
+  body{font-size:11px}
+  nav,.picker,.legend{display:none}
+  .panel[hidden]{display:block!important}
+  .months{grid-template-columns:1fr 1fr;gap:10px}
+  .gridcard,.month,.courses,.note{break-inside:avoid;box-shadow:none}
+  .day{min-height:56px}
+  header{padding:0 0 10px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">东华理工大学 · 数学与应用数学（中外合作）</div>
+  <h1>2623606 班 · 课程表</h1>
+  <div class="sub">2026—2027 学年第 1 学期　|　2026 年 9 月 7 日 — 2027 年 1 月 23 日　|　共 18 个教学周</div>
+  <div class="stats">
+    <div class="stat"><b>10</b><span>门课</span></div>
+    <div class="stat"><b>27.5</b><span>总学分</span></div>
+    <div class="stat"><b>18</b><span>教学周</span></div>
+    <div class="stat"><b id="s-early">—</b><span>早八次数</span></div>
+    <div class="stat"><b id="s-slots">—</b><span>总课时（节）</span></div>
+  </div>
+</header>
+
+<nav role="tablist">
+  <button class="tab" role="tab" aria-selected="true"  data-p="week">📅 周课表</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="month">🗓️ 月历</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="courses">📚 课程清单</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="info">ℹ️ 说明</button>
+</nav>
+
+<!-- ══════════ 周课表 ══════════ -->
+<section class="panel" id="p-week">
+  <div class="legend" id="legend"></div>
+  <div class="picker">
+    <label>选一周 →</label>
+    <div class="weeks" id="weeks"></div>
+  </div>
+  <div class="gridcard"><div class="grid" id="grid"></div></div>
+  <div class="weeknote" id="weeknote"></div>
+</section>
+
+<!-- ══════════ 月历 ══════════ -->
+<section class="panel" id="p-month" hidden>
+  <div class="legend" id="legend2"></div>
+  <div class="months" id="months"></div>
+</section>
+
+<!-- ══════════ 课程清单 ══════════ -->
+<section class="panel" id="p-courses" hidden>
+  <div class="courses"><table>
+    <thead><tr><th>课程</th><th>类型</th><th>教师</th><th>学分</th><th>学时</th><th>上课时间</th></tr></thead>
+    <tbody id="ctbody"></tbody>
+  </table></div>
+  <h2>讲座型课程（时间另行通知）</h2>
+  <div class="note">
+    <dl class="kv" id="talks"></dl>
+  </div>
+  <h2>调课 / 补课</h2>
+  <div class="note">
+    <ul id="mklist"></ul>
+  </div>
+</section>
+
+<!-- ══════════ 说明 ══════════ -->
+<section class="panel" id="p-info" hidden>
+  <div class="note">
+    <h2 style="margin-top:0">几点说明</h2>
+    <ul>
+      <li><b>第 1—4 周没有课</b>：9/5—6 新生报到，<b>9/7—15 新生入学教育和体检</b>，9/16—30 军训，10/1—7 国庆。<b>正式上课从 10 月 8 日（第 5 周）开始</b>。</li>
+      <li>依据《东华理工大学 2026—2027 学年第一学期校历》：教学周数 <b>18 周</b>；期末考试周 2027/1/11—22；1/23 放寒假（至 2/26，共五周）。</li>
+      <li>9 月 10 日为教师节（不放假，仅标注）。</li>
+      <li>节假日调休以<b>国务院公布时间</b>为准——校历原文即如此注明。</li>
+      <li><b>不是每天早八</b>：1-2 节的课只在部分周次开设。用「周课表」标签选具体周次就能看到当周真实时间。</li>
+      <li><b>周末个别周有课</b>：第 9 周周六「集合、函数、实数」，第 11 周周六「几何1」。</li>
+      <li><b>10 月 10 日（周六）补第 5 周周三的课</b>：10/5—10/7 在国庆假期里，第 5 周的周一到周三三天课都被冲掉，学校用 10/10（周六）把「周三」那天补回来。在「周课表」里选到 <b>W5</b>，周六那一列会标「补课」并按周三的课表显示。来源：任课老师通知（2026-10-04）。</li>
+      <li><b>第 5 周周一、周二不补课</b>：10/5、10/6 也在国庆假期里，这两天的课（周一：雅思 / 体育 / 数分；周二：数分）<b>不作补排</b> —— 本次补课只有 10/10 这一天（2026-10-05 确认）。</li>
+      <li><b>大学体育Ⅰ 是板块课</b>：原件把它排在 <b>周一 5–6 节（14:00–15:40）</b>，本表按此位置显示、周次暂按第 5–18 周；<b>场地与最终项目以体育部通知为准</b>（原件未给场地与周次）。</li>
+      <li><b>红色文化 / 国家安全教育 / 数学专业导论</b> 是讲座型课程，安排在对应周内、具体时间另行通知。</li>
+      <li>节假日调休以国务院公布及学校通知为准。</li>
+    </ul>
+  </div>
+  <h2>教学周 ↔ 日期速查</h2>
+  <div class="courses"><table>
+    <thead><tr><th>周次</th><th>起</th><th>止</th><th>备注</th></tr></thead>
+    <tbody id="wtbody"></tbody>
+  </table></div>
+  <h2>数据来源</h2>
+  <div class="note">
+    教务处课表（班级课表2026.9.pdf，打印时间 2026-09-08）+ 校历。<br>
+    本页为<b>本地生成的静态文件</b>，不依赖网络；课表如有调整，以教务处最新通知为准。
+  </div>
+</section>
+
+<footer>
+  <span>2623606 班 · 2026—2027 学年第 1 学期</span>
+  <span id="built"></span>
+</footer>
+
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   数据层 —— 全部由教务处原始课表整理而来
+   ══════════════════════════════════════════════════════════════ */
+
+const TERM = { start:new Date(2026,8,7), weeks:18, label:'2026—2027 学年第 1 学期' };
+
+/* 节次时间 */
+const SLOTS = [
+  { k:'1-2',  name:'1-2 节',  time:'08:00–09:40', row:1 },
+  { k:'3-4',  name:'3-4 节',  time:'10:00–11:40', row:2 },
+  { k:'5-6',  name:'5-6 节',  time:'14:00–15:40', row:3 },
+  { k:'7-8',  name:'7-8 节',  time:'16:00–17:40', row:4 },
+  { k:'9-10', name:'9-10 节', time:'19:00–20:40', row:5 },
+];
+
+/* 节次时间（含跨节次区间的起止，如 1-4 节连上） */
+const SLOT_TIME = {
+  '1-2':'08:00–09:40', '3-4':'10:00–11:40', '5-6':'14:00–15:40',
+  '7-8':'16:00–17:40', '9-10':'19:00–20:40',
+  '1-4':'08:00–11:40', '5-8':'14:00–17:40',
+};
+const startOf = k => (SLOT_TIME[k] || '—').split('–')[0];
+
+const DOW = ['周一','周二','周三','周四','周五','周六','周日'];
+const DOW_S = ['一','二','三','四','五','六','日'];
+
+/* 课程元数据 */
+const COURSES = {
+  '数学分析(I)':      { t:'major', short:'数分',   credit:5.0, hours:80, teacher:'袁志会 / 颜七笙', note:'与 2623607 合班' },
+  '高等代数(I)':      { t:'major', short:'高代',   credit:4.0, hours:64, teacher:'张建华',           note:'与 2623607 合班' },
+  '集合、函数、实数':  { t:'major', short:'集合函数', credit:3.0, hours:28, teacher:'王文雅',          note:'四班合上' },
+  '几何1':            { t:'major', short:'几何',   credit:5.0, hours:28, teacher:'王文雅',           note:'四班合上' },
+  '雅思英语I':        { t:'lang',  short:'雅思',   credit:4.0, hours:64, teacher:'李雪',             note:'与 2623607 合班（分班上课）' },
+  '思想道德与法治':    { t:'pol',   short:'思修',   credit:3.0, hours:40, teacher:'王海宁',           note:'四班合上' },
+  '形势与政策（I）':   { t:'pol',   short:'形策',   credit:0.5, hours:8,  teacher:'刘艳红 / 肖倩云 / 白丹 / 王冬芝', note:'四班合上' },
+  '军事理论':         { t:'pol',   short:'军理',   credit:1.0, hours:16, teacher:'万军林',           note:'四班合上' },
+  '大学生心理健康教育（I）':{ t:'pol', short:'心理', credit:0.5, hours:8, teacher:'刘阳',             note:'限选 · 四班合上' },
+  '大学体育Ⅰ':        { t:'pe',    short:'体育',   credit:null,hours:null,teacher:'—',              note:'板块课，时间地点以体育部通知为准' },
+};
+
+/* 讲座型课程 */
+const TALKS = [
+  ['红色文化',         '第 5—9 周',   '讲座型，具体时间另行通知'],
+  ['数学专业导论',      '第 6—13 周',  '讲座型，具体时间另行通知'],
+  ['国家安全教育',      '第 13—18 周', '讲座型，具体时间另行通知'],
+];
+
+/* 排课规则：星期(1-7) + 节次 + 周次列表 + 教室 */
+const RULES = [
+  // 周一
+  { d:1, s:'3-4',  c:'雅思英语I',       w:[5,6,7,8,9,12,14,15,16,17,18], r:'核工楼105' },
+  { d:1, s:'7-8',  c:'数学分析(I)',      w:[13,14,15,16,17,18],          r:'3-105' },
+  { d:1, s:'9-10', c:'数学分析(I)',      w:[5,6,7,8,9,10,11],            r:'3-118' },
+  /* ⚠️ 2026-10-03 按主人指示补排：原件里「大学体育Ⅰ(板块)」挂在**周一 5-6 节**（14:00–15:40）。
+     原件没给周次也没给场地（板块课由体育部定），故此处以「第 5–18 周 / 待体育部定」为默认值；
+     体育部通知下来后改这一行即可。 */
+  { d:1, s:'5-6',  c:'大学体育Ⅰ',       w:[5,6,7,8,9,10,11,12,13,14,15,16,17,18], r:'待体育部定' },
+  { d:1, s:'1-2',  c:'集合、函数、实数',  w:[10,11], span:'1-4',         r:'3-623' },
+  { d:1, s:'1-2',  c:'几何1',            w:[13], span:'1-4',             r:'3-508' },
+  // 周二
+  { d:2, s:'1-2',  c:'高等代数(I)',      w:[13,14,15,16,17,18],          r:'3-112' },
+  { d:2, s:'3-4',  c:'数学分析(I)',      w:[5,6,7,8,9,10,11,13,14,15,16,17,18], r:'3-113' },
+  { d:2, s:'7-8',  c:'思想道德与法治',    w:[9,10,11,12],                 r:'3-102' },
+  { d:2, s:'1-2',  c:'几何1',            w:[12], span:'1-4',             r:'3-508' },
+  // 周三
+  { d:3, s:'1-2',  c:'大学生心理健康教育（I）', w:[5,6,7,8],              r:'3-102' },
+  { d:3, s:'3-4',  c:'雅思英语I',        w:[5,6,7,8,13,14,15,16],        r:'核工楼105' },
+  { d:3, s:'3-4',  c:'军事理论',          w:[17,18],                      r:'3-102' },
+  { d:3, s:'7-8',  c:'高等代数(I)',      w:[5,6,7,8,9,10,11,12,13,14,15,16,17,18], r:'3-305' },
+  { d:3, s:'1-2',  c:'集合、函数、实数',  w:[9,10], span:'1-4',          r:'阶16' },
+  { d:3, s:'1-2',  c:'几何1',            w:[11,12], span:'1-4',          r:'阶16' },
+  // 周四
+  { d:4, s:'1-2',  c:'数学分析(I)',      w:[5,6,7,8,9,10,11,12,13,14,15,16,17,18], r:'3-411' },
+  { d:4, s:'3-4',  c:'思想道德与法治',    w:[8,9,10,11,12,14,15,16],      r:'3-102' },
+  { d:4, s:'7-8',  c:'形势与政策（I）',   w:[15,16,17,18],                r:'3-208' },
+  /* ⚠️ 2026-10-03 补排：原件 2623606 清单页/网格页都写了「星期四 9-10 军事理论 13-18 周 / 3-102 /
+     万军林」，旧版本漏了这一条（当时军理只排出 4 学时，与原件声明的总学时 16 不符）。 */
+  { d:4, s:'9-10', c:'军事理论',          w:[13,14,15,16,17,18],          r:'3-102' },
+  { d:4, s:'5-6',  c:'几何1',            w:[11,12], span:'5-8',          r:'3-608' },
+  // 周五
+  { d:5, s:'1-2',  c:'高等代数(I)',      w:[5,6,7,8,11,12,13,14,15,16,17,18], r:'3-101' },
+  { d:5, s:'5-6',  c:'雅思英语I',        w:[5,6,7,8,9,10,11,12,13,14,15,16,17], r:'3-117' },
+  { d:5, s:'7-8',  c:'思想道德与法治',    w:[8,9,10,11,12,14,15,16],      r:'3-404' },
+  { d:5, s:'1-2',  c:'集合、函数、实数',  w:[9,10], span:'1-4',          r:'3-621' },
+  // 周六
+  { d:6, s:'1-2',  c:'集合、函数、实数',  w:[9], span:'1-4',             r:'3-104' },
+  { d:6, s:'1-2',  c:'几何1',            w:[11], span:'1-4',            r:'3-104' },
+];
+
+/* 特殊日期（优先级高于排课）
+   依据《东华理工大学 2026—2027 学年第一学期校历》原文：
+   一、老生 9/3-4 报到注册，9/7 上课
+   二、9/5-6 南昌校区新生报到，9/7-15 南昌校区新生入学教育和体检；9/16-30 所有新生军训，10/8 上课
+   三、10/21-23 校运动会   四、2027/1/11-22 期末考试周   五、2027/1/23 放寒假
+   六、本学期教学周数 18 周  七、寒假 2027/1/23—2/26（共五周）  注：调休以国务院公布时间为准 */
+const EVENTS = [
+  { from:'2026-09-05', to:'2026-09-06', label:'新生报到',       type:'misc' },
+  { from:'2026-09-07', to:'2026-09-15', label:'入学教育·体检',  type:'misc' },
+  { from:'2026-09-16', to:'2026-09-30', label:'军训',           type:'misc' },
+  { from:'2026-09-25', to:'2026-09-25', label:'中秋节',         type:'holiday' },
+  { from:'2026-10-01', to:'2026-10-07', label:'国庆节',         type:'holiday' },
+  { from:'2026-10-21', to:'2026-10-23', label:'校运动会',       type:'misc' },
+  { from:'2027-01-01', to:'2027-01-01', label:'元旦',           type:'holiday' },
+  { from:'2027-01-11', to:'2027-01-22', label:'期末考试周',     type:'misc' },
+  { from:'2027-01-23', to:'2027-01-23', label:'放寒假',         type:'holiday' },
+];
+
+/* 调课 / 补课（单日特殊安排，优先级高于常规排课与节假日）
+   ← 2026-10-04 主人转述任课老师通知：**10 月 10 日（周六）补第 5 周周三的课**。
+     背景：10/5—10/7 在国庆假期里，第 5 周的周一、周二、周三三天课都被冲掉，
+     学校用 10/10（周六）把「周三」那天的课补回来。
+   ✅ 第 5 周**周一、周二**的课**不作补排**（2026-10-05 经主人确认：本次补课**只有 10/10 这一天**）。
+     以后若还有别的调课 / 补课，往这里加一条即可（followsW / followsD 分别指"按哪一周、星期几"的课表上）。
+   ⚠️ 已落在补课日上的课，本表按"补课日优先"处理：即使那天原本是节假日，也照补课表上课。 */
+const MAKEUPS = [
+  { date:'2026-10-10', followsW:5, followsD:3, from:'2026-10-07',
+    label:'补 第 5 周周三 的课', source:'任课老师通知（2026-10-04）' },
+];
+function makeupOf(date){
+  return MAKEUPS.find(m => m.date === iso(date)) || null;
+}
+
+const TYPES = {
+  major:{ label:'数学专业课',   c:'major' },
+  lang: { label:'语言课（雅思）', c:'lang'  },
+  pol:  { label:'思政 / 通识 / 军事', c:'pol' },
+  pe:   { label:'体育',         c:'pe'    },
+  talk: { label:'讲座型课程',   c:'talk'  },
+};
+
+/* ══════════════════════════════════════════════════════════════
+   工具
+   ══════════════════════════════════════════════════════════════ */
+const pad = n => String(n).padStart(2,'0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const dayOnly = d => new Date(d.getFullYear(),d.getMonth(),d.getDate());
+const addDays = (d,n) => { const x=new Date(d); x.setDate(x.getDate()+n); return x; };
+
+/* 某天属于第几教学周（1..18），不在学期内返回 null */
+function weekOf(date){
+  const d = dayOnly(date);
+  const diff = Math.round((d - TERM.start)/86400000);
+  if (diff < 0) return null;
+  const w = Math.floor(diff/7)+1;
+  return w >= 1 && w <= TERM.weeks ? w : null;
+}
+function weekStart(w){ return addDays(TERM.start,(w-1)*7); }
+
+/* 某天命中的特殊事件（可能多个，如中秋节落在军训期间）—— 节假日优先 */
+function eventsOf(date){
+  const s = iso(date);
+  return EVENTS
+    .filter(e => s >= e.from && s <= e.to)
+    .sort((a,b) => (a.type === 'holiday' ? 0 : 1) - (b.type === 'holiday' ? 0 : 1));
+}
+function eventOf(date){ return eventsOf(date)[0] || null; }
+
+/* 某天某节的课（考虑跨节次 span）
+   · 补课日（MAKEUPS）优先：按 followsW / followsD 指定的那一周那一天的课表上课；
+   · 其余日子：节假日一律无课，星期与周次按当天算。 */
+function coursesAt(date, slotKey){
+  const mk = makeupOf(date);
+  if (!mk && eventOf(date)) return [];
+  const w = mk ? mk.followsW : weekOf(date);
+  if (w === null) return [];
+  const dow = mk ? mk.followsD : (date.getDay() === 0 ? 7 : date.getDay());
+  const out = [];
+  for (const r of RULES){
+    if (r.d !== dow) continue;
+    if (!r.w.includes(w)) continue;
+    const span = r.span || r.s;
+    const [a1,a2] = span.split('-').map(Number);
+    const [b1,b2] = slotKey.split('-').map(Number);
+    if (b1 >= a1 && b1 <= a2) out.push(r);
+  }
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   图例
+   ══════════════════════════════════════════════════════════════ */
+function renderLegend(el){
+  el.innerHTML = Object.entries(TYPES).map(([k,v]) =>
+    `<span class="lg"><i class="dot" style="background:var(--${v.c})"></i>${v.label}</span>`
+  ).join('') + `<span class="lg"><i class="dot" style="background:var(--warn)"></i>节假日</span>`
+              + `<span class="lg"><i class="dot" style="background:var(--ink3)"></i>报到 / 军训 / 活动</span>`;
+}
+renderLegend(document.getElementById('legend'));
+renderLegend(document.getElementById('legend2'));
+
+/* ══════════════════════════════════════════════════════════════
+   周课表
+   ══════════════════════════════════════════════════════════════ */
+/* 默认停留周 —— 2026-09-10 本人要求：停在「当周」
+   规则：只要今天落在学期内（W1–W18），就停在当周，哪怕当周没课
+   （军训 / 国庆 / 入学教育周会显示"无课"，这是事实，不再自动跳走）；
+   只有在今天还没开学（今天早于 9/7）时，才回退到第一个有课的周，免得一开就是空白。 */
+const todayWeek = weekOf(new Date());
+let curWeek = (function(){
+  if (todayWeek !== null) return todayWeek;
+  for (let w = 1; w <= TERM.weeks; w++) if (countWeek(w).slots > 0) return w;
+  return 1;
+})();
+
+const weeksEl = document.getElementById('weeks');
+weeksEl.innerHTML = `<button class="wbtn nowbtn" id="nowbtn" type="button">回到本周</button>`
+  + Array.from({length:TERM.weeks},(_,i)=>{
+      const w = i+1, s = weekStart(w);
+      return `<button class="wbtn" data-w="${w}" aria-pressed="${w===curWeek}">W${w}<span class="n">${s.getMonth()+1}/${s.getDate()}</span></button>`;
+    }).join('');
+weeksEl.addEventListener('click', e=>{
+  const b = e.target.closest('.wbtn'); if(!b) return;
+  curWeek = +b.dataset.w;
+  weeksEl.querySelectorAll('.wbtn').forEach(x=>x.setAttribute('aria-pressed', x.dataset.w===String(curWeek)));
+  renderGrid();
+  b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+});
+
+/* 「回到本周」—— 2026-09-10 新增：翻周之后一键跳回当周 */
+const nowBtn = document.getElementById('nowbtn');
+if (nowBtn){
+  if (todayWeek === null){ nowBtn.hidden = true; }
+  else {
+    nowBtn.addEventListener('click', ()=>{
+      curWeek = todayWeek;
+      weeksEl.querySelectorAll('.wbtn').forEach(x=>x.setAttribute('aria-pressed', x.dataset.w===String(curWeek)));
+      renderGrid();
+      const t = weeksEl.querySelector(`.wbtn[data-w="${curWeek}"]`);
+      if (t) t.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+    });
+  }
+}
+
+const gridEl = document.getElementById('grid');
+
+function cellContent(date, slotKey){
+  const mk = makeupOf(date);
+  const evs = mk ? [] : eventsOf(date);   // 补课日优先：那天照补课表上课，不显示节假日
+  if (evs.length){
+    if (slotKey !== '1-2') return '';   // 标签只在第一大节显示一次，其余行靠底色表达，避免一列重复五遍
+    return evs.map(ev=>`<div class="ev t-rest"><b>${ev.label}</b></div>`).join('');
+  }
+  const w = weekOf(date);
+  if (w === null) return '<div class="empty">—</div>';
+  const cs = coursesAt(date, slotKey);
+  const tag = (mk && slotKey === '1-2') ? `<div class="ev t-makeup"><b>补课</b><span class="m">${mk.label}</span></div>` : '';
+  if (!cs.length) return tag || '<div class="empty">—</div>';
+  return tag + cs.map(r=>{
+    const m = COURSES[r.c] || {t:'talk',short:r.c};
+    return `<div class="ev t-${m.t}"><b>${m.short||r.c}</b><span class="m">${r.r}</span></div>`;
+  }).join('');
+}
+
+function renderGrid(){
+  const ws = weekStart(curWeek);
+  let html = '<div class="gh" style="background:var(--line2)">节次</div>';
+  for (let i=0;i<7;i++){
+    const d = addDays(ws,i);
+    const mk = makeupOf(d);
+    let cls = i>=5 ? 'gh we' : 'gh';
+    if (mk) cls += ' mk';
+    html += `<div class="${cls}">${DOW[i]}<br><span style="font-weight:500;font-size:11px;opacity:.72">${d.getMonth()+1}/${d.getDate()}</span>${mk?'<span class="mkb">补课</span>':''}</div>`;
+  }
+  for (const s of SLOTS){
+    html += `<div class="gt"><b>${s.name}</b>${s.time.replace('–','<br>')}</div>`;
+    for (let i=0;i<7;i++){
+      const d = addDays(ws,i);
+      const mk = makeupOf(d);
+      let extra = (d.getDay()===0) ? ' dim' : '';
+      if (!mk && eventsOf(d).length) extra += ' ev-day';
+      if (mk) extra += ' mk-day';
+      html += `<div class="gc${extra}">${cellContent(d,s.k)}</div>`;
+    }
+  }
+  gridEl.innerHTML = html;
+
+  // 本周小结
+  const total = countWeek(curWeek);
+  const s = weekStart(curWeek), e = addDays(s,6);
+  let note = `<b>第 ${curWeek} 周</b>（${s.getMonth()+1} 月 ${s.getDate()} 日 — ${e.getMonth()+1} 月 ${e.getDate()} 日）`;
+  if (total.slots === 0){
+    const ev = eventOf(s) || eventOf(addDays(s,3));
+    note += ev ? ` —— 本周为「${ev.label}」，无正式课程。` : ' —— 本周无课。';
+    // 当周无课时，补一行"距开课还有几天"（只在当周显示，翻别的周时不打扰）
+    if (curWeek === todayWeek){
+      const FIRST_CLASS_DAY = new Date(2026,9,8);   // 10/8 首次上课，依据校历原文
+      const days = Math.round((dayOnly(FIRST_CLASS_DAY) - dayOnly(new Date()))/86400000);
+      const md = `${FIRST_CLASS_DAY.getMonth()+1}/${FIRST_CLASS_DAY.getDate()}`;
+      note += days > 0
+        ? ` 👉 <b>距离开课还有 ${days} 天</b>（${md} 周四 · 数学分析 08:00 / 3-411）。`
+        : days === 0
+          ? ' 👉 <b>今天就是开课日</b>，别迟到。'
+          : ' 👉 开课日已过。';
+    }
+  } else {
+    note += ` —— 共 <b>${total.slots} 节</b>课`;
+    if (total.early) note += `，其中 <b>${total.early} 天早八</b>`;
+    note += '。';
+  }
+  // 本周若有补课日，单独标出来
+  const mks = [];
+  for (let i=0;i<7;i++){ const d = addDays(s,i); const mk = makeupOf(d); if (mk) mks.push([d,mk]); }
+  if (mks.length){
+    note += '<div class="mkline">📌 ' + mks.map(([d,mk])=>{
+      const dw = DOW[d.getDay()===0 ? 6 : d.getDay()-1];
+      const fm = +mk.from.slice(5,7), fd = +mk.from.slice(8,10);
+      return `<b>${d.getMonth()+1} 月 ${d.getDate()} 日（${dw}）</b>按「${mk.label}」上课`
+           + `<br><span style="opacity:.85">原定上课日 ${fm} 月 ${fd} 日（周三）在国庆假期里，这一天是把它补回来；来源：${mk.source}。</span>`;
+    }).join('<br>') + '</div>';
+  }
+  document.getElementById('weeknote').innerHTML = note;
+}
+
+function countWeek(w){
+  const ws = weekStart(w); let slots=0, early=0;
+  for (let i=0;i<7;i++){
+    const d = addDays(ws,i);
+    if (eventOf(d)) continue;
+    let first = null;
+    for (const s of SLOTS){
+      const cs = coursesAt(d,s.k);
+      if (cs.length){ slots += 2; if(first===null) first = s.k; }
+    }
+    if (first === '1-2') early++;
+  }
+  return { slots, early };
+}
+renderGrid();
+
+/* ══════════════════════════════════════════════════════════════
+   月历
+   ══════════════════════════════════════════════════════════════ */
+function renderMonths(){
+  const out = [];
+  const months = [[2026,8],[2026,9],[2026,10],[2026,11],[2027,0]]; // 9,10,11,12,1月
+  const today = iso(new Date());
+  for (const [y,m] of months){
+    const first = new Date(y,m,1);
+    const daysInMonth = new Date(y,m+1,0).getDate();
+    const lead = (first.getDay()+6)%7;                 // 周一为首列
+    const cells = [];
+    for (let i=0;i<lead;i++) cells.push(null);
+    for (let d=1;d<=daysInMonth;d++) cells.push(new Date(y,m,d));
+    while (cells.length % 7 !== 0) cells.push(null);
+
+    let body = '';
+    for (const d of cells){
+      if (!d){ body += '<div class="day out"></div>'; continue; }
+      const evs = eventsOf(d);
+      const w = weekOf(d);
+      const isToday = iso(d) === today;
+      let chips = '';
+      if (evs.length){
+        chips = evs.map(ev=>`<div class="chip c-${ev.type==='holiday'?'holiday':'misc'}">${ev.label}</div>`).join('');
+      } else if (w !== null){
+        const seen = new Set();
+        for (const s of SLOTS){
+          for (const r of coursesAt(d,s.k)){
+            const key = r.c + r.span;
+            if (seen.has(key)) continue;
+            seen.add(key);
+            const meta = COURSES[r.c] || {t:'talk',short:r.c};
+            const span = r.span || r.s;
+            chips += `<div class="chip c-${meta.t}">${meta.short||r.c}<small>${startOf(span)} ${r.r}</small></div>`;
+          }
+        }
+      }
+      const rc = d.getDay()===0 ? ' out' : '';
+      body += `<div class="day${isToday?' today':''}${w===null?'':''}">
+        <div class="dn"><span>${d.getDate()}</span>${w?`<span class="wk">W${w}</span>`:''}</div>${chips}</div>`;
+    }
+
+    const noteList = [];
+    if (m===8) noteList.push('9/5—6 新生报到 · 9/7—15 入学教育和体检 · 9/16—30 军训');
+    if (m===9) noteList.push('10/8 正式上课 · <b>10/10（周六）补第 5 周周三的课</b> · 10/21—23 校运动会');
+    if (m===11) noteList.push('第 9、11 周周六有课');
+    if (m===0) noteList.push('1/1 元旦 · 1/11—22 期末复习考试 · 1/23 放假');
+
+    out.push(`<div class="month">
+      <div class="mhead"><b>${y} 年 ${m+1} 月</b><span>${daysInMonth} 天</span></div>
+      <div class="dow">${DOW_S.map(x=>`<div>${x}</div>`).join('')}</div>
+      <div class="days">${body}</div>
+      ${noteList.length?`<div class="mfoot">${noteList.map(n=>`<span>${n}</span>`).join('')}</div>`:''}
+    </div>`);
+  }
+  document.getElementById('months').innerHTML = out.join('');
+}
+renderMonths();
+
+/* ══════════════════════════════════════════════════════════════
+   课程清单
+   ══════════════════════════════════════════════════════════════ */
+function fmtWeeks(w){
+  if (!w || !w.length) return '—';
+  const s=[...w].sort((a,b)=>a-b), runs=[]; let a=s[0], p=s[0];
+  for (let i=1;i<=s.length;i++){
+    if (s[i] === p+1){ p=s[i]; continue; }
+    runs.push(a===p?`${a}`:`${a}–${p}`); a=p=s[i];
+  }
+  return '第 ' + runs.join('、') + ' 周';
+}
+const timesOf = c => RULES.filter(r=>r.c===c).map(r=>{
+  const span = r.span || r.s;
+  return `${DOW[r.d-1]} ${span}节 ${startOf(span)} ${r.r}（${fmtWeeks(r.w)}）`;
+});
+
+document.getElementById('ctbody').innerHTML = Object.entries(COURSES).map(([name,m])=>{
+  const tt = TYPES[m.t] || {label:'—',c:'talk'};
+  const ts = timesOf(name);
+  return `<tr>
+    <td class="cname">${m.short||name}<div style="font-weight:400;font-size:11.5px;color:var(--ink3);margin-top:2px">${name}</div></td>
+    <td><span class="pill" style="color:var(--${tt.c});border-color:color-mix(in srgb,var(--${tt.c}) 30%,transparent);background:var(--${tt.c}-bg)">${tt.label}</span></td>
+    <td>${m.teacher}${m.note?`<div style="font-size:11.5px;color:var(--ink3);margin-top:2px">${m.note}</div>`:''}</td>
+    <td class="tnum">${m.credit ?? '—'}</td>
+    <td class="tnum">${m.hours ?? '—'}</td>
+    <td style="font-size:12.5px;color:var(--ink2)">${ts.length?ts.map(t=>`<div>${t}</div>`).join(''):'<span style="color:var(--ink3)">以体育部通知为准</span>'}</td>
+  </tr>`;
+}).join('');
+
+document.getElementById('talks').innerHTML = TALKS.map(([n,w,d])=>
+  `<dt>${n}</dt><dd>${w} · <span style="color:var(--ink3)">${d}</span></dd>`).join('');
+
+/* 调课 / 补课清单（数据只在 MAKEUPS 里写一次，其它视图都从它读） */
+document.getElementById('mklist').innerHTML = MAKEUPS.length ? MAKEUPS.map(m=>{
+  const fm = +m.from.slice(5,7), fd = +m.from.slice(8,10);
+  const d = new Date(+m.date.slice(0,4), +m.date.slice(5,7)-1, +m.date.slice(8,10));
+  const dw = DOW[d.getDay()===0 ? 6 : d.getDay()-1];
+  return `<li><b>${d.getMonth()+1} 月 ${d.getDate()} 日（${dw}）</b>按「${m.label}」上课`
+       + `　<span style="color:var(--ink3)">原定 ${fm} 月 ${fd} 日 · 来源：${m.source}</span></li>`;
+}).join('') : '<li style="color:var(--ink3)">暂无调课 / 补课安排。</li>';
+
+/* ══════════════════════════════════════════════════════════════
+   教学周速查
+   ══════════════════════════════════════════════════════════════ */
+document.getElementById('wtbody').innerHTML = Array.from({length:TERM.weeks},(_,i)=>{
+  const w=i+1, s=weekStart(w), e=addDays(s,6);
+  const c = countWeek(w);
+  if (w<=4){
+    note = ['入学教育和体检','入学教育结束 → 9/16 起军训','军训（9/25 中秋节）','军训 → 10/1 起国庆'][w-1];
+  } else {
+    note = c.slots ? `${c.slots} 节课` : '无课';
+    if (c.early) note += ` · ${c.early} 天早八`;
+    const mkDays = [];
+    for (let i=0;i<7;i++){ const d=addDays(s,i); if (makeupOf(d)) mkDays.push(`${d.getMonth()+1}/${d.getDate()} 补课`); }
+    if (mkDays.length) note += ` · ${mkDays.join('、')}`;
+  }
+  return `<tr><td class="cname">W${w}</td><td class="tnum">${s.getMonth()+1} 月 ${s.getDate()} 日</td><td class="tnum">${e.getMonth()+1} 月 ${e.getDate()} 日</td><td style="color:var(--ink2)">${note}</td></tr>`;
+}).join('');
+
+/* ══════════════════════════════════════════════════════════════
+   顶部统计 + 标签切换
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  let slots=0, early=0;
+  for (let w=1; w<=TERM.weeks; w++){ const c=countWeek(w); slots+=c.slots; early+=c.early; }
+  document.getElementById('s-early').textContent = early;
+  document.getElementById('s-slots').textContent = slots;
+})();
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected', x===t));
+    document.querySelectorAll('.panel').forEach(p=>p.hidden = (p.id !== 'p-'+t.dataset.p));
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+/* 直链：#week / #month / #courses / #info 可直接打开对应视图 */
+(function(){
+  const h = (location.hash || '').replace('#','');
+  if (!h) return;
+  const t = document.querySelector('.tab[data-p="' + h + '"]');
+  if (t) t.click();
+})();
+
+document.getElementById('built').textContent = '生成于 ' + new Date().toLocaleDateString('zh-CN');
+</script>
+</body>
+</html>
