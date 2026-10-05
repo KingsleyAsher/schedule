@@ -63,7 +63,15 @@ nav::-webkit-scrollbar{display:none}
 .dot{width:9px;height:9px;border-radius:3px;flex:none}
 
 /* ── week picker ── */
-.picker{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+/* 2026-10-05 按本人要求：把这一条钉在顶部（顶部导航之下），
+   滚到下面看课表时也能随时切周、随手点「回到本周」。
+   --navh 由 JS 实测导航高度写入，避免写死像素数在字体/换行变化时错位。 */
+.picker{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  position:sticky;top:var(--navh,52px);z-index:20;
+  background:color-mix(in srgb,var(--bg) 92%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  padding:8px 0;margin:-8px 0 16px}
 .picker label{font-size:13px;color:var(--ink2);font-weight:600}
 .weeks{display:flex;gap:5px;overflow-x:auto;padding:3px;scrollbar-width:none;flex:1;min-width:0}
 .weeks::-webkit-scrollbar{display:none}
@@ -102,8 +110,12 @@ nav::-webkit-scrollbar{display:none}
 .ev .m,.ev .r{opacity:.82}
 .empty{color:var(--ink3);font-size:11px;text-align:center;padding:14px 0;opacity:.5}
 .weeknote{margin-top:14px;font-size:13px;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:11px 14px}
-/* 回到本周按钮（2026-09-10 新增） */
-.wbtn.nowbtn{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;margin-right:6px}
+/* 回到本周按钮（2026-09-10 新增；2026-10-05 改为**钉在周选择器最左侧**）
+   之前它随周数条一起左右滚走 —— 想翻到 W15 之后再点它，得先把条子拖回最左边。
+   现在 position:sticky; left:0 让它横滚时始终贴住左边缘（灰色阴影表示别的周从它下面滑过去）。 */
+.wbtn.nowbtn{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;
+  position:sticky;left:0;z-index:3;margin-right:7px;
+  box-shadow:7px 0 10px -5px rgba(16,24,40,.22)}
 .wbtn.nowbtn:hover{opacity:.88}
 
 /* ── month calendar ── */
@@ -479,7 +491,12 @@ weeksEl.innerHTML = `<button class="wbtn nowbtn" id="nowbtn" type="button">回�
       return `<button class="wbtn" data-w="${w}" aria-pressed="${w===curWeek}">W${w}<span class="n">${s.getMonth()+1}/${s.getDate()}</span></button>`;
     }).join('');
 weeksEl.addEventListener('click', e=>{
-  const b = e.target.closest('.wbtn'); if(!b) return;
+  const b = e.target.closest('.wbtn');
+  /* ⚠️ 2026-10-05 修（本人报的 bug）：「回到本周」按钮本身就是 `.wbtn`、又在这个容器里，
+     点它会先跑自己的监听器、再冒泡到这里的**事件委托**。它没有 `data-w`，
+     `+undefined` = NaN 会把刚设好的 curWeek 覆盖成 NaN → 整页变成「第 NaN 周」。
+     所以这里必须要求 data-w 存在（没有 data-w 的 .wbtn 一律不归委托管）。 */
+  if (!b || !b.dataset.w) return;
   curWeek = +b.dataset.w;
   weeksEl.querySelectorAll('.wbtn').forEach(x=>x.setAttribute('aria-pressed', x.dataset.w===String(curWeek)));
   renderGrid();
@@ -522,6 +539,11 @@ function cellContent(date, slotKey){
 }
 
 function renderGrid(){
+  /* 兜底闸门：curWeek 只允许是 1..18 的整数。任何原因让它变成 NaN / 越界，
+     一律拉回本周（todayWeek 为空时回退到 W1），而不是把整页渲染成「NaN 月 NaN 日」。 */
+  if (!Number.isInteger(curWeek) || curWeek < 1 || curWeek > TERM.weeks){
+    curWeek = todayWeek || 1;
+  }
   const ws = weekStart(curWeek);
   let html = '<div class="gh" style="background:var(--line2)">节次</div>';
   for (let i=0;i<7;i++){
@@ -734,6 +756,21 @@ document.querySelectorAll('.tab').forEach(t=>{
     window.scrollTo({top:0,behavior:'smooth'});
   });
 });
+
+/* 周选择器吸顶时要知道顶部导航的真实高度（字体/换行会让它变），
+   实测后写进 CSS 变量 --navh，别在 CSS 里写死像素。 */
+(function(){
+  const nav = document.querySelector('nav');
+  if (!nav) return;
+  const setNavH = () => {
+    const h = Math.round(nav.getBoundingClientRect().height);
+    if (h > 0) document.documentElement.style.setProperty('--navh', h + 'px');
+  };
+  setNavH();
+  window.addEventListener('resize', setNavH);
+  window.addEventListener('orientationchange', setNavH);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(setNavH).catch(()=>{});
+})();
 
 /* 直链：#week / #month / #courses / #info 可直接打开对应视图 */
 (function(){
