@@ -236,6 +236,17 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);font-si
   <div class="note">
     <dl class="kv" id="talks"></dl>
   </div>
+  <h2>数学专业导论 · 2026 年排期（南昌 · 中外合作 · 第 6—13 周）</h2>
+  <div class="note" style="margin-bottom:10px">
+    全部在 <b>周二</b>，地点均为 <b>3-310</b>。钟点：5–6 节 14:00–15:40 · 7–8 节 16:00–17:40 · 9–10 节 19:00–20:40。<br>
+    <b>这 8 场已并入「周课表」与「月历」</b>——翻到对应周次的周二格子会出现「导论 · 3-310」。<br>
+    来源：任课老师发的《2026年数学专业导论安排表（6-13周）》（2026-10-13 收到）。
+    <span style="color:var(--warn)">注意：标注处为需要向老师核实的点，本表不代替老师通知。</span>
+  </div>
+  <div class="courses"><table>
+    <thead><tr><th>日期</th><th>周次</th><th>节次</th><th>时间</th><th>主讲</th><th>选题</th><th>地点</th></tr></thead>
+    <tbody id="tstbody"></tbody>
+  </table></div>
   <h2>调课 / 补课</h2>
   <div class="note">
     <ul id="mklist"></ul>
@@ -256,8 +267,8 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);font-si
       <li><b>10 月 10 日（周六）补第 5 周周三的课</b>：10/5—10/7 在国庆假期里，第 5 周的周一到周三三天课都被冲掉，学校用 10/10（周六）把「周三」那天补回来。在「周课表」里选到 <b>W5</b>，周六那一列会标「补课」并按周三的课表显示。来源：任课老师通知（2026-10-04）。</li>
       <li><b>第 5 周周一、周二不补课</b>：10/5、10/6 也在国庆假期里，这两天的课（周一：雅思 / 体育 / 数分；周二：数分）<b>不作补排</b> —— 本次补课只有 10/10 这一天（2026-10-05 确认）。</li>
       <li><b>大学体育Ⅰ 是板块课</b>：原件把它排在 <b>周一 5–6 节（14:00–15:40）</b>，本表按此位置显示、周次暂按第 5–18 周；<b>场地与最终项目以体育部通知为准</b>（原件未给场地与周次）。</li>
-      <li><b>红色文化 / 国家安全教育 / 数学专业导论</b> 是讲座型课程，安排在对应周内、具体时间另行通知。</li>
-      <li>节假日调休以国务院公布及学校通知为准。</li>
+      <li><b>红色文化 / 国家安全教育</b> 是讲座型课程，安排在对应周内、具体时间另行通知；<b>数学专业导论</b> 的排期已确定并<b>已并入周课表与月历</b> —— 第 6—13 周<b>每周二</b>共 8 场、地点 <b>3-310</b>（周二格子里的「导论」），明细见「课程清单」页的排期表（来源：任课老师 2026-10-13 发的安排表）。</li>
+      <li><b>元旦</b>：校历原文只写了 <b>2027 年 1 月 1 日（周五）</b> 这一天，所以本表也只标这一天；<b>连休怎么排以国务院公布为准</b>。其余节假日（中秋 / 国庆 / 校运动会 / 期末周 / 寒假）均照校历原文。</li>
     </ul>
   </div>
   <h2>教学周 ↔ 日期速查</h2>
@@ -323,8 +334,29 @@ const COURSES = {
 /* 讲座型课程 */
 const TALKS = [
   ['红色文化',         '第 5—9 周',   '讲座型，具体时间另行通知'],
-  ['数学专业导论',      '第 6—13 周',  '讲座型，具体时间另行通知'],
+  ['数学专业导论',      '第 6—13 周',  '已并入周课表与月历（周二格子显示「导论 · 3-310」）；明细见下方排期表'],
   ['国家安全教育',      '第 13—18 周', '讲座型，具体时间另行通知'],
+];
+
+/* ── 数学专业导论 · 2026 年排期（第 6—13 周 · 南昌 · 中外合作 · 3-310）───────────────
+   来源：任课老师发的《2026年数学专业导论安排表（6-13周）》xlsx（2026-10-13 收到，
+   原件归档 90-收件箱/原件归档/2026-10-13/2026年数学专业导论安排.xlsx，
+   知识库条目 40-素材资源/2026-10-13-数学专业导论讲座安排（6-13周）.md）。
+   原件另含「抚州」校区一栏，与本班无关，未收进本表。
+   ⚠️ 11/3 那一场：课表里「思想道德与法治」在第 9—12 周 周二 7-8 节（3-102），
+      与它同格 —— 本表**只标注，不判定谁让位**，以老师通知为准。
+   ⚠️ 11/24 那一场是 9-10 节（19:00–20:40，晚上），与原件表头「周二下午」不符，已标注。 */
+const TALK_SCHEDULE = [
+  { date:'2026-10-13', w:6,  s:'7-8',  t:'阮周生', topic:'数学在科学工程中的应用',   room:'3-310' },
+  { date:'2026-10-20', w:7,  s:'5-6',  t:'袁志会', topic:'三大数学危机与解决',       room:'3-310' },
+  { date:'2026-10-27', w:8,  s:'5-6',  t:'张建华', topic:'数学在数据分析中的应用',   room:'3-310' },
+  { date:'2026-11-03', w:9,  s:'7-8',  t:'张文',   topic:'概论',                     room:'3-310',
+    clash:'与「思想道德与法治」（第 9—12 周周二 7-8 节 · 3-102）同格，需向老师确认' },
+  { date:'2026-11-10', w:10, s:'5-6',  t:'颜七笙', topic:'数学变革',                 room:'3-310' },
+  { date:'2026-11-17', w:11, s:'5-6',  t:'颜七笙', topic:'智能计算及应用',           room:'3-310' },
+  { date:'2026-11-24', w:12, s:'9-10', t:'刘唐伟', topic:'数学文化与数学史简介',     room:'3-310',
+    note:'晚上 19:00–20:40' },
+  { date:'2026-12-01', w:13, s:'5-6',  t:'胡康秀', topic:'经典数学与现代科技的碰撞', room:'3-310' },
 ];
 
 /* 排课规则：星期(1-7) + 节次 + 周次列表 + 教室 */
@@ -344,6 +376,22 @@ const RULES = [
   { d:2, s:'3-4',  c:'数学分析(I)',      w:[5,6,7,8,9,10,11,13,14,15,16,17,18], r:'3-113' },
   { d:2, s:'7-8',  c:'思想道德与法治',    w:[9,10,11,12],                 r:'3-102' },
   { d:2, s:'1-2',  c:'几何1',            w:[12], span:'1-4',             r:'3-508' },
+  /* ── 数学专业导论 · 2026 年 8 场讲座（2026-10-13 并入；数据源与下面 TALK_SCHEDULE 一致）──
+     来源：任课老师发的《2026年数学专业导论安排表（6-13周）》xlsx，原件归档
+     90-收件箱/原件归档/2026-10-13/2026年数学专业导论安排.xlsx
+     知识库条目：40-素材资源/2026-10-13-数学专业导论讲座安排（6-13周）.md
+     · 全部在周二、地点 3-310；`short` 让格子/月历显示「导论」，`t:'talk'` 走讲座型配色。
+     · ⚠️ 11/3（W9）7-8 节与「思想道德与法治」同格 —— 两门都会显示，本表不判定谁让位。
+     · ⚠️ 11/24（W12）是 9-10 节（晚上），与原件表头「周二下午」不符，已在此留痕。
+     · 这 8 条同时供 TALK_SCHEDULE 表与周课表/月历使用；两处日期必须一致，改一处要同步另一处。 */
+  { d:2, s:'7-8',  c:'数学专业导论', w:[6],  short:'导论', t:'talk', r:'3-310' },
+  { d:2, s:'5-6',  c:'数学专业导论', w:[7],  short:'导论', t:'talk', r:'3-310' },
+  { d:2, s:'5-6',  c:'数学专业导论', w:[8],  short:'导论', t:'talk', r:'3-310' },
+  { d:2, s:'7-8',  c:'数学专业导论', w:[9],  short:'导论', t:'talk', r:'3-310' },
+  { d:2, s:'5-6',  c:'数学专业导论', w:[10], short:'导论', t:'talk', r:'3-310' },
+  { d:2, s:'5-6',  c:'数学专业导论', w:[11], short:'导论', t:'talk', r:'3-310' },
+  { d:2, s:'9-10', c:'数学专业导论', w:[12], short:'导论', t:'talk', r:'3-310' },
+  { d:2, s:'5-6',  c:'数学专业导论', w:[13], short:'导论', t:'talk', r:'3-310' },
   // 周三
   { d:3, s:'1-2',  c:'大学生心理健康教育（I）', w:[5,6,7,8],              r:'3-102' },
   { d:3, s:'3-4',  c:'雅思英语I',        w:[5,6,7,8,13,14,15,16],        r:'核工楼105' },
@@ -533,7 +581,7 @@ function cellContent(date, slotKey){
   const tag = (mk && slotKey === '1-2') ? `<div class="ev t-makeup"><b>补课</b><span class="m">${mk.label}</span></div>` : '';
   if (!cs.length) return tag || '<div class="empty">—</div>';
   return tag + cs.map(r=>{
-    const m = COURSES[r.c] || {t:'talk',short:r.c};
+    const m = COURSES[r.c] || {t:r.t||'talk', short:r.short||r.c};
     return `<div class="ev t-${m.t}"><b>${m.short||r.c}</b><span class="m">${r.r}</span></div>`;
   }).join('');
 }
@@ -651,7 +699,7 @@ function renderMonths(){
             const key = r.c + r.span;
             if (seen.has(key)) continue;
             seen.add(key);
-            const meta = COURSES[r.c] || {t:'talk',short:r.c};
+            const meta = COURSES[r.c] || {t:r.t||'talk',short:r.short||r.c};
             const span = r.span || r.s;
             chips += `<div class="chip c-${meta.t}">${meta.short||r.c}<small>${startOf(span)} ${r.r}</small></div>`;
           }
@@ -666,7 +714,7 @@ function renderMonths(){
     if (m===8) noteList.push('9/5—6 新生报到 · 9/7—15 入学教育和体检 · 9/16—30 军训');
     if (m===9) noteList.push('10/8 正式上课 · <b>10/10（周六）补第 5 周周三的课</b> · 10/21—23 校运动会');
     if (m===11) noteList.push('第 9、11 周周六有课');
-    if (m===0) noteList.push('1/1 元旦 · 1/11—22 期末复习考试 · 1/23 放假');
+    if (m===0) noteList.push('1/1 元旦（周五；<b>连休安排以国务院公布为准</b>） · 1/11—22 期末复习考试 · 1/23 放假');
 
     out.push(`<div class="month">
       <div class="mhead"><b>${y} 年 ${m+1} 月</b><span>${daysInMonth} 天</span></div>
@@ -711,6 +759,24 @@ document.getElementById('ctbody').innerHTML = Object.entries(COURSES).map(([name
 
 document.getElementById('talks').innerHTML = TALKS.map(([n,w,d])=>
   `<dt>${n}</dt><dd>${w} · <span style="color:var(--ink3)">${d}</span></dd>`).join('');
+
+/* 数学专业导论排期表（数据只在 TALK_SCHEDULE 里写一次） */
+document.getElementById('tstbody').innerHTML = TALK_SCHEDULE.map(x=>{
+  const d = new Date(+x.date.slice(0,4), +x.date.slice(5,7)-1, +x.date.slice(8,10));
+  const wd = DOW[d.getDay()===0 ? 6 : d.getDay()-1];
+  const isToday = iso(d) === iso(new Date());
+  const marks = [x.note, x.clash].filter(Boolean);
+  return `<tr${isToday?' style="background:var(--talk-bg)"':''}>
+    <td class="cname">${d.getMonth()+1}/${d.getDate()}${isToday?' <span style="color:var(--talk);font-size:11.5px">今天</span>':''}
+      <div style="font-weight:400;font-size:11.5px;color:var(--ink3);margin-top:2px">${wd}</div></td>
+    <td class="tnum">W${x.w}</td>
+    <td class="tnum">${x.s} 节</td>
+    <td class="tnum">${SLOT_TIME[x.s]||'—'}</td>
+    <td>${x.t}</td>
+    <td>${x.topic}${marks.length?`<div style="font-size:11.5px;color:var(--warn);margin-top:2px">注意：${marks.join('；')}</div>`:''}</td>
+    <td class="tnum">${x.room}</td>
+  </tr>`;
+}).join('');
 
 /* 调课 / 补课清单（数据只在 MAKEUPS 里写一次，其它视图都从它读） */
 document.getElementById('mklist').innerHTML = MAKEUPS.length ? MAKEUPS.map(m=>{
