@@ -269,7 +269,7 @@ footer{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);font-si
       <li><b>大学体育Ⅰ 是板块课</b>：原件把它排在 <b>周一 5–6 节（14:00–15:40）</b>，本表按此位置显示、周次暂按第 5–18 周；<b>场地与最终项目以体育部通知为准</b>（原件未给场地与周次）。</li>
       <li><b>红色文化 / 国家安全教育</b> 是讲座型课程，安排在对应周内、具体时间另行通知；<b>数学专业导论</b> 的排期已确定并<b>已并入周课表与月历</b> —— 第 6—13 周<b>每周二</b>共 8 场、地点 <b>3-310</b>（周二格子里的「导论」），明细见「课程清单」页的排期表（来源：任课老师 2026-10-13 发的安排表）。</li>
       <li><b>元旦</b>：校历原文只写了 <b>2027 年 1 月 1 日（周五）</b> 这一天，所以本表也只标这一天；<b>连休怎么排以国务院公布为准</b>。其余节假日（中秋 / 国庆 / 期末周 / 寒假）均照校历原文。</li>
-      <li><b>10/21—23 校运动会</b>：校历原文第三条（2026 年 10 月 21-23 日 校运动会），未写停课；本表在这三天标出该活动，课按教务处课表列出。<b>是否停课以学校通知为准。</b></li>
+      <li><b>10/21—23 校运动会</b>：校历原文第三条（2026 年 10 月 21-23 日 校运动会）；<b>这三天没有课程</b>，本表只标出该活动、不排课。</li>
     </ul>
   </div>
   <h2>教学周 ↔ 日期速查</h2>
@@ -421,20 +421,22 @@ const RULES = [
    三、10/21-23 校运动会   四、2027/1/11-22 期末考试周   五、2027/1/23 放寒假
    六、本学期教学周数 18 周  七、寒假 2027/1/23—2/26（共五周）  注：调休以国务院公布时间为准
 
-   ⚠️ 两类事件（2026-10-19 改，别再混用）：
-   · 默认（无 keepClasses）＝当天整段无课：军训 / 国庆 / 中秋 / 期末周 / 报到等；
-   · keepClasses:true ＝只做标记、不冲课：**校运动会**。
-     依据：校历第三条只写「2026 年 10 月 21-23 日 校运动会」，**没有写停课**；
+   ⚠️ 事件的含义（2026-10-19 定稿）：**列在这里的日子一律当天整段无课**
+   （报到 / 入学教育 / 军训 / 中秋 / 国庆 / 校运动会 / 元旦 / 期末周 / 寒假），
+   判断"这天有没有课"统一走 suppressingEvents，不要各自另写一套。
+   · 校运动会：校历第三条只写「2026 年 10 月 21-23 日 校运动会」、**没有写停课**；
      教务处《班级课表2026.9.pdf》（打印时间 2026-09-08）第 7 周也照常列了这三天的课
-     （周三 3 门 / 周四 1 门 / 周五 2 门，共 12 节）。
-     旧版把运动会当整段停课屏蔽，静默吞掉了这 12 节 —— 已按本人 2026-10-19 的核对结果改正。 */
+     （周三 3 门 / 周四 1 门 / 周五 2 门，共 12 节）。但**本人 2026-10-19 确认：
+     本周运动会期间实际没有课程** → 按「当天无课」处理（由事件冲掉，RULES 保持与
+     教务处原件一致、不删周次，与国庆冲掉第 5 周周一~周三同一种处理方式）。
+   · note:true ＝在本周小结与教学周速查里单独点出这个活动（目前只有校运动会用）。 */
 const EVENTS = [
   { from:'2026-09-05', to:'2026-09-06', label:'新生报到',       type:'misc' },
   { from:'2026-09-07', to:'2026-09-15', label:'入学教育·体检',  type:'misc' },
   { from:'2026-09-16', to:'2026-09-30', label:'军训',           type:'misc' },
   { from:'2026-09-25', to:'2026-09-25', label:'中秋节',         type:'holiday' },
   { from:'2026-10-01', to:'2026-10-07', label:'国庆节',         type:'holiday' },
-  { from:'2026-10-21', to:'2026-10-23', label:'校运动会',       type:'misc', keepClasses:true },
+  { from:'2026-10-21', to:'2026-10-23', label:'校运动会',       type:'misc', note:true },
   { from:'2027-01-01', to:'2027-01-01', label:'元旦',           type:'holiday' },
   { from:'2027-01-11', to:'2027-01-22', label:'期末考试周',     type:'misc' },
   { from:'2027-01-23', to:'2027-01-23', label:'放寒假',         type:'holiday' },
@@ -490,12 +492,12 @@ function eventsOf(date){
 }
 function eventOf(date){ return eventsOf(date)[0] || null; }
 
-/* 事件分两类（2026-10-19 新增，见 EVENTS 头部说明）
-   · suppressingEvents = 当天整段无课（军训 / 国庆 / 中秋 / 期末周 / 报到…）
-   · badgeEvents       = 只做标记、不冲课（校运动会）
-   凡"某天有没有课"的判断都必须走 suppressingEvents，不能再直接用 eventOf。 */
-function suppressingEvents(date){ return eventsOf(date).filter(e => !e.keepClasses); }
-function badgeEvents(date){ return eventsOf(date).filter(e => e.keepClasses); }
+/* 「某天有没有课」的唯一判断入口（2026-10-19 定稿，见 EVENTS 头部说明）
+   · suppressingEvents = 当天整段无课 —— 目前 EVENTS 里每一条都是这个含义（含校运动会）
+   · notedEvents       = 需要在本周小结 / 教学周速查里单独点出的活动（校运动会）
+   凡"某天有没有课"的判断都必须走 suppressingEvents，不要各自另写一套。 */
+function suppressingEvents(date){ return eventsOf(date); }
+function notedEvents(date){ return eventsOf(date).filter(e => e.note); }
 
 /* 某天某节的课（考虑跨节次 span）
    · 补课日（MAKEUPS）优先：按 followsW / followsD 指定的那一周那一天的课表上课；
@@ -583,7 +585,6 @@ const gridEl = document.getElementById('grid');
 function cellContent(date, slotKey){
   const mk = makeupOf(date);
   const evs = mk ? [] : suppressingEvents(date);   // 补课日优先：那天照补课表上课，不显示节假日
-  const badges = mk ? [] : badgeEvents(date);      // 只标记、不冲课的（校运动会）
   if (evs.length){
     if (slotKey !== '1-2') return '';   // 标签只在第一大节显示一次，其余行靠底色表达，避免一列重复五遍
     return evs.map(ev=>`<div class="ev t-rest"><b>${ev.label}</b></div>`).join('');
@@ -593,9 +594,6 @@ function cellContent(date, slotKey){
   const cs = coursesAt(date, slotKey);
   let head = '';
   if (mk && slotKey === '1-2') head += `<div class="ev t-makeup"><b>补课</b><span class="m">${mk.label}</span></div>`;
-  /* 校运动会：只在第一大节旁边挂一个标记（2026-10-19 改，本人要求只标注活动本身） */
-  if (badges.length && slotKey === '1-2')
-    head += badges.map(ev=>`<div class="ev t-rest"><b>${ev.label}</b></div>`).join('');
   if (!cs.length) return head || '<div class="empty">—</div>';
   return head + cs.map(r=>{
     const m = COURSES[r.c] || {t:r.t||'talk', short:r.short||r.c};
@@ -665,16 +663,16 @@ function renderGrid(){
            + `<br><span style="opacity:.85">原定上课日 ${fm} 月 ${fd} 日（周三）在国庆假期里，这一天是把它补回来；来源：${mk.source}。</span>`;
     }).join('<br>') + '</div>';
   }
-  /* 本周若有「只标记、不冲课」的活动（校运动会），只标活动本身（2026-10-19 改） */
+  /* 本周若有需要单独点出的活动（校运动会），在本周小结里补一行（2026-10-19） */
   const bds = [];
-  for (let i=0;i<7;i++){ const d = addDays(s,i); for (const ev of badgeEvents(d)) bds.push([d,ev]); }
+  for (let i=0;i<7;i++){ const d = addDays(s,i); for (const ev of notedEvents(d)) bds.push([d,ev]); }
   if (bds.length){
     const f = bds[0][0], l = bds[bds.length-1][0];
     const dwF = DOW[f.getDay()===0 ? 6 : f.getDay()-1], dwL = DOW[l.getDay()===0 ? 6 : l.getDay()-1];
     const range = bds.length === 1
       ? `${f.getMonth()+1} 月 ${f.getDate()} 日（${dwF}）`
       : `${f.getMonth()+1} 月 ${f.getDate()} 日（${dwF}）— ${l.getMonth()+1} 月 ${l.getDate()} 日（${dwL}）`;
-    note += `<div class="mkline">🏃 <b>${bds[0][1].label}</b>：${range}</div>`;
+    note += `<div class="mkline">🏃 <b>${bds[0][1].label}</b>：${range}，<b>没有课程</b></div>`;
   }
   document.getElementById('weeknote').innerHTML = note;
 }
@@ -715,15 +713,12 @@ function renderMonths(){
     for (const d of cells){
       if (!d){ body += '<div class="day out"></div>'; continue; }
       const sup = suppressingEvents(d);
-      const badges = badgeEvents(d);
       const w = weekOf(d);
       const isToday = iso(d) === today;
       let chips = '';
       if (sup.length){
         chips = sup.map(ev=>`<div class="chip c-${ev.type==='holiday'?'holiday':'misc'}">${ev.label}</div>`).join('');
       } else if (w !== null){
-        /* 校运动会：标记照出，课也照出（2026-10-19 改） */
-        chips += badges.map(ev=>`<div class="chip c-misc">${ev.label}</div>`).join('');
         const seen = new Set();
         for (const s of SLOTS){
           for (const r of coursesAt(d,s.k)){
@@ -833,7 +828,7 @@ document.getElementById('wtbody').innerHTML = Array.from({length:TERM.weeks},(_,
     for (let i=0;i<7;i++){ const d=addDays(s,i); if (makeupOf(d)) mkDays.push(`${d.getMonth()+1}/${d.getDate()} 补课`); }
     if (mkDays.length) note += ` · ${mkDays.join('、')}`;
     const bdNames = [];
-    for (let i=0;i<7;i++){ const d=addDays(s,i); for (const ev of badgeEvents(d)) if (!bdNames.includes(ev.label)) bdNames.push(ev.label); }
+    for (let i=0;i<7;i++){ const d=addDays(s,i); for (const ev of notedEvents(d)) if (!bdNames.includes(ev.label)) bdNames.push(ev.label); }
     if (bdNames.length) note += ` · ${bdNames.join('、')}`;
   }
   return `<tr><td class="cname">W${w}</td><td class="tnum">${s.getMonth()+1} 月 ${s.getDate()} 日</td><td class="tnum">${e.getMonth()+1} 月 ${e.getDate()} 日</td><td style="color:var(--ink2)">${note}</td></tr>`;
